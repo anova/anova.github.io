@@ -1,7 +1,7 @@
 ﻿---
 layout: post
 title:  "Grunt notlarım"
-date:
+date: 1970-01-01 00:00:00 +0300
 categories: grunt sass postcss
 ---
 1. gitignore.io adresinden grunt ve node için olan direktifleri projedeki .gitignore dosyasına yapıştır.
