@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Git from bottom up notları"
-date:   2017-03-06 00:15:00 +0300
+date:   2018-12-26 22:15:00 +0300
 categories: git
 ---
 
