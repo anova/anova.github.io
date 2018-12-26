@@ -55,6 +55,7 @@ Aklımda kaldığı kadarıyla, özeti yazmak istedim.
 - Aynı dosyada aynı satırda farklı kişiler, farklı değişiklikler yapmışsa, git bunlardan hangisinin geçerli olduğunu bilemez. Elle bizim düzeltmemizi ister.
 - Bunun için conflict marker denilen bir yapı oluşturur. Yaklaşık şuna benzer:
 
+```
 <<<<<<<<<<<<<<<<<<<<<<<<<<< bizdeki commit hash
 bizim yaptığımız değişikler
 buradaki satırlarda
@@ -62,6 +63,7 @@ buradaki satırlarda
 başkasından gelen değişiklikler
 buradaki satırlarda
 başkasının yaptığı commit hash >>>>>>>>>>>>>>>>>>>
+```
 
 `git checkout dosyaismi --ours`
 bizim yaptığımız değişiklikleri alır
