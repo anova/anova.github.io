@@ -5,6 +5,10 @@ date: 2018-12-30 18:00:00 +0300
 categories: webpack
 ---
 
+## Ön not: yazıda geçen örnekler
+
+Yazıda bir sürü kod örneği var. Bu kod örneklerini yazarken bir tarafdan bir git repository oluşturup orada denedim. Bu git repositorye buradan ulaşabilirsiniz: [webpack examples][webpack-examples]
+
 ## Webpack ile ilk karşılaşmam
 
 Webpack ile ilk kez Addy Osmani sayesinde karşılaştım diyebilirim. İlk karşılaşmam hiç de güzel geçmemişti, çünkü alışık olduğum grunt ve gulp çalışma mantığından farklı bir mantıkta çalışıyordu webpack. Uzun zamanlar, ara sıra biraz kullanmaya çalışıp sonra vazgeçtiğim bir araç oldu. (Her seferinde yeterince ciddi denemiyordum, karşılaştığım ilk zorlukta bırakıyordum daha doğrusu.)
