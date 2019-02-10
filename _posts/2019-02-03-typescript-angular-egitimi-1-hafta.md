@@ -7,6 +7,8 @@ categories: angular typescript
 
 GÜNCELLENECEK. Son güncelleme: 3 Şubat 2019 - 22:30
 
+[Stackblitz örnekleri][Stackblitz]
+
 Şubat ayı boyunca hafta sonları angular ve typescript eğitimi alacağız. Bu eğitimden aldığım notları temize çekiyorum. Bu yazıda ilk hafta notları bulunmaktadır.
 
 ## TypeScript
@@ -122,3 +124,4 @@ Formlarda binding yapıldığı zaman, formlar bind edilen ifadeyi değiştirebi
 [Node]: https://nodejs.org/en/
 [TypeScript]: https://www.typescriptlang.org/
 [Angular CLI]: https://cli.angular.io/
+[Stackblitz]: https://stackblitz.com/@anova
