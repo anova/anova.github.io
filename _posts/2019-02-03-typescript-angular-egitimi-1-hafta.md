@@ -5,8 +5,6 @@ date: 2019-02-03 20:10:00 +0300
 categories: angular typescript
 ---
 
-GÜNCELLENECEK. Son güncelleme: 3 Şubat 2019 - 22:30
-
 [Stackblitz örnekleri][Stackblitz]
 
 Şubat ayı boyunca hafta sonları angular ve typescript eğitimi alacağız. Bu eğitimden aldığım notları temize çekiyorum. Bu yazıda ilk hafta notları bulunmaktadır.
@@ -101,7 +99,7 @@ Uygulamada genel olarak kullanılacak model ve servisleri app/models veya app/se
 
 #### One way binding
 
-`{{ model.Member }}` şeklinde html template içinde geçtiğinde sadece bir yönlü binding. Güncelleme yapılamaz sadece okunur.
+`{% raw %}{{ model.Member }}{% endraw %}` şeklinde html template içinde geçtiğinde sadece bir yönlü binding. Güncelleme yapılamaz sadece okunur.
 
 Not: modeldeki veriyi componente bağlamak için örnek bir yazım şekli eklemek lazım.
 
@@ -119,9 +117,33 @@ Formlarda binding yapıldığı zaman, formlar bind edilen ifadeyi değiştirebi
 
 #### *ngIf, ng-template
 
+*ngIf belirlenen bir şart doğru olduğunda içeriği gösterir. Örneğin:
+
+`<h1 *ngIf="model.IsPersonel">Personel</h1>` buradaki `model.IsPersonel` şartı sağlanıyorsa h1 tagı gösterilir. Eğer şart sağlanmıyorsa, tag yalnızca gizlenmez, aynı zamanda sayfaya render da edilmeyecektir. (Sayfayı veya komponenti öğeyi denetle ile incelediğimizde ilgili tagı yine göremeyiz.) Burada yaptığı iş basitçe gizlemek değil sayfaya render edilip edilmeyeceğine karar vermektir aslında.
+
+#### *ngIf else ile kullanımı (ng-template)
+
+```html
+<h1 *ngIf="model.IsPersonel else not_personel">Personel</h1>
+<ng-template #not_personel>
+  <h1>Personel değil</h1>
+</ng-template>
+```
+
 #### *ngFor
+
+*ngFor direktifi bir koleksiyonun içinde döngüye girip, bu döngüde tüm elemanları bastırmak için idealdir. Kendine özgü bir "micro syntax" ı vardır, genellikle şöyle kullanılır:
+
+`*ngFor="let i of collection"`
+
+Tırnak içinde geçen ifade bir `of` kullanıyor. ES6 ile javascript'e gelen for..of döngüsü diğer dillerdeki foreach gibi çalışır. Bu direktif angular dokümanında *ngForOf diye de geçiyor bu yüzden.
+
+* [*ngIf için stackblitz'de hazırladığım örnek için tıklayınız][ngIf Stackblitz]
+* [*ngFor için stackblitz'de hazırladığım örnek için tıklayınız][ngFor Stackblitz]
 
 [Node]: https://nodejs.org/en/
 [TypeScript]: https://www.typescriptlang.org/
 [Angular CLI]: https://cli.angular.io/
 [Stackblitz]: https://stackblitz.com/@anova
+[ngIf Stackblitz]: https://stackblitz.com/edit/anova-angular-directives-sample?file=src%2Fapp%2Fcomponent%2Fmuhasebe%2Fmuhasebe.component.html
+[ngFor Stackblitz]: https://stackblitz.com/edit/anova-angular-directives-sample?file=src%2Fapp%2Fcomponent%2Fresimler%2Fresimler.component.html
