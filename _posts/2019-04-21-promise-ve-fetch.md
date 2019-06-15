@@ -5,6 +5,8 @@ date: 2019-04-21 14:20:00 +0300
 categories: javascript
 ---
 
+[Promise, async, await - Özgün Bal][Promise Özgün Bal]
+
 Promise, bir işlemin başarılı veya başarısız olarak biteceğini garanti eden bir yapıdır.
 
 > Promise, bir javascript fonksiyonunun sonucu hemen döndürmeyip, bize sonucu döndüreceğine dair verdiği bir "söz" dür.
@@ -105,3 +107,4 @@ Burada iki adet `then` birbirine zincirleme olarak bağlanmış. Buna **promise 
 
 [MDN Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [jsonplaceholder]: https://jsonplaceholder.typicode.com/
+[Promise Özgün Bal]: https://medium.com/codefiction/javascriptte-promise-kullan%C4%B1m%C4%B1-ccca1123989a
