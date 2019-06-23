@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  "Merhaba Webpack!"
+title: "Merhaba Webpack!"
 date: 2018-12-30 18:00:00 +0300
 categories: webpack
 ---
 
 ## Ön not: yazıda geçen örnekler
 
-Yazıda bir sürü kod örneği var. Bu kod örneklerini yazarken bir tarafdan bir git repository oluşturup orada denedim. Bu git repositorye buradan ulaşabilirsiniz: [webpack examples][webpack-examples]
+Yazıda birçok kod örneği var. Bu kod örneklerini yazarken bir tarafdan bir git repository oluşturup orada denedim. Bu git repositorye buradan ulaşabilirsiniz: [webpack examples][webpack-examples]
 
 ## Webpack ile ilk karşılaşmam
 
