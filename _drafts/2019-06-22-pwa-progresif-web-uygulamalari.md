@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PWA: Progresif Web Uygulamaları"
-date: 2019-06-22 18:30:00 +0300
+date: 2019-06-22 16:00 +0300
 categories: pwa
 ---
 
@@ -56,3 +56,33 @@ Konu ile ilgili eğitimler:
 
 [pwa codelab]: https://codelabs.developers.google.com/codelabs/your-first-pwapp/
 [pwa training]: https://developers.google.com/web/ilt/pwa/
+
+Konu ile ilgili videolar ve aldığım notlar:
+- [Google I/O 2018, PWAs: building bridges to mobile, desktop, and native (Google I/O '18)][google io 2018]
+    - FIRE: Fast, Integrated, Reliable, Engaging
+        - Fast: Hızlı başlamalı ve hızlı hissettirmeli
+        - Integrated: Cihazla entegre çalışmalı, bir uygulamaymış gibi açılmalı, cihazın özelliklerini kullanabilmeli. (Örnek olarak Payment Request API ile ödemeleri kolayca yapabilmeliyim diyor.)
+        - Reliable: Uygulama her zaman çalışmalı. Offline veya düşük bağlantı olduğu durumlarda bile bu durumlar düşünülmüş ve uygulama içinde bunlara özel mesajlar veya çözümler sunulmalıdır.
+        - Engaging: Bir PWA arama motorları tarafından indekslenebilir. İçinde arama yapılabilir. Link olarak paylaşılabilir. Bu yönüyle kullanıcıları kendine çekebilen bir yapısı vardır.
+    - Uygulamada konum veya bildirim izinleri sadece ihtiyaç olduğu zaman istenmelidir. (3:12)
+        - Mağaza arandığında konumun istenmesi
+        - Stokta ürün yoksa, ürün geldiğinde haberdar etmek için bildirim gönderilmesi isteği
+        - gibi durumlar.
+    - Sign In & Sign Up durumlarını google identity ile çözebiliriz. (3:26)
+        - Kullanıcılara giriş yapması veya kayıt olması gerektiğini doğru zamanda göstermeliyiz.
+        - Kayıt olmadan yapamayacakları bir durumda göstermeliyiz. Bildirim izinleri de kayıt olmak da sayfaya girer girmez istenmemelidir.
+    - Ödemelerde (Payments) kullanılabilecek servisler (3:42)
+        - Payment Request API
+        - Google Pay Integration
+    - Formlar (4:10)
+        - Doğru input tipi
+        - autocomplete özelliği
+        - Not: Sitelerin %42 si inputlar için doğru klavye tipini göstermiyormuş.
+        - Not: Sitelerin %27 si formlarda seçime bağlı alanların hangisi olduğunu belirtmiyormuş.
+    - [Mobile Web Principles Dev Guidelines][mobile web principles] (5:42)
+        - Burada Jenny Gove'un yazdığı "İyi bir mobil site nasıl olur?" prensipleri listeleniyor.
+    - "FIRE" prensiplerini sağlamak için "Service Worker" kullanırız.Service Worker yapısı bugün tüm modern tarayıcılarda desteklenmektedir. Safari ve Edge dahil.
+    - Tarayıcıların PWA desteği (6:22): ![PWA Support](/assets/images/2019-06-23-pwa/pwa-support.jpg)
+
+[google io 2018]: https://www.youtube.com/watch?v=NITk4kXMQDw
+[mobile web principles]: bit.ly/mobile-web-principles-dev-guidelines
