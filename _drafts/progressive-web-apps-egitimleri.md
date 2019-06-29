@@ -79,6 +79,53 @@ Service Workerların en büyük avantajları basit JavaScript dosyaları olmalar
 
 Bir geliştirici olarak service worker yapısını öğrenmenin size katacağı şeyler muazzamdır. HTML, CSS ve JavaScript bilginizle native uygulamaları geride bırakan deneyimleri bu sayede yaratabilirsiniz.
 
+### Bölüm 2 - İlk Service Worker ınız
+
+Kitap uygulamalı bir anlatım metodunu benimsemiş. Bir github repository var. Onu kendimize klonlayıp, bölüm bölüm anlatılan konuları uygulayıp kodu geliştireceğiz. Her bölüm sonunda çalışan bir web uygulamamız olacak ve kitabın sonunda da tam bir PWA geliştirmiş olacağız.
+
+Kodları git ile indirmek için:
+
+```
+git clone -b ch02-start git@github.com:TalAter/gotham_imperial_hotel.git
+cd gotham_imperial_hotel
+npm install
+```
+
+Bu kodları indirdikten sonra `npm start` komutu vererek kodu çalıştırıyoruz.
+
+Çalışan uygulamayı tarayıcıdan `http://localhost:8443` adresinden görebiliyoruz.
+
+Böyle bir uygulamanın seçilmesinin sebebi, klasik web sitelerinin nasıl PWA haline getirildiğini örneklemek içindir.
+
+#### Kodun yapısı
+
+Kod iki önemli ana klasör içerir:
+
+`public` klasörü tüm client side kodları tutar. resimler ve stiller de bu klasörde bulunur.
+
+`server` klasörü tüm sunucu taraflı işlemleri yapar, rezervasyonları takip eder ve bildirimleri (notifications) gönderir.
+
+#### İlk offline deneyim
+
+Bu siteye herhangi bir service worker eklemediğimiz durumda offline olduğumuzda (npm start ile başlattığımız serverı durdurduğumuzda veya chrome devtools dan offline moda geçtiğimizde) chrome un standart offline iken çıkan dinozorunu görürüz.
+
+#### İlk Service Worker
+
+Uygulama kodumuzun en üstüne şu satırları yazalım:
+
+```javascript
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/serviceworker.js")
+    .then(function(registration) {
+        console.log("Service Worker registered with scope:", registration.scope);
+    }).catch(function(err) {
+        console.log("Service worker registration failed:", err);
+    });
+}
+```
+
+
+
 
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
 
