@@ -124,7 +124,126 @@ if ("serviceWorker" in navigator) {
 }
 ```
 
+Kod, tarayıcının Service Worker desteği olup olmadığını kontrol ederek başlıyor. Sonra Service Worker kayıt eden `navigator.serviceWorker.register` metodunu çağırıyor. Bu metot iki parametre alır. İlk parametresi Service Worker scriptinin adresidir. İkinci parametre opsiyoneldir. Bu örnekte kullanılmamıştır. İleride "Service Worker Kapsamı" (Service Worker Scope) konusunu işlerken değineceğiz.
 
+Service Worker kodlarını çalıştırmadan önce desteklenip desteklenmediğini kontrol etmek "Progressive Enhancement" ilkesi gereğidir. Böylece kodlarımız Service Worker desteklemeyen eski tarayıcılarda sessizce atlanır, hata vermez.
+
+`register` metodu bir *promise* döndürür. Eğer *promise* başarılı bir şekide çalışırsa `then` içinde yazılan kod bloğu, başarısızlığa uğrarsa `catch` içine yazılan kod bloğu işletilir.
+
+İlk denememiz başarısız olacak ve catch içindeki kod çalışacaktır. Çünkü henüz register metodu içindeki serviceworker.js dosyasını oluşturmadık.
+
+Bu hatayı gidermek için kök klasörümüzde (bizim örneğimizde /public klasörü) içi boş bir `serviceworker.js` dosyası oluşturalım. İçi boş bir script dosyası olmasına rağmen bu geçerli bir service worker olarak kayıt edilecektir.
+
+> **Dikkat:** serviceworker.js dosyası bir javascript dosyası olduğu için onu /js klasörüne almamalıyız. Service worker dosyaları daima içinde bulunduğu klasörleri ve alt klasörleri kapsarlar. Bunu ileride "Service Worker Scope" (Service Worker Kapsamı) adı altında göreceğiz.
+
+Şimdi serviceworker.js dosyasında neler yapabileceğimize bir bakalım. Aşağıdaki kodu serviceworker.js dosyanıza ekleyin:
+
+```javascript
+self.addEventListener("fetch", function(event) {
+    console.log("Fetch request for:", event.request.url);
+});
+```
+
+Bu kod service worker a `fetch` olayını ekler. serviceworker.js içindeki `self` ifadesi service worker'ın kendisini temsil ediyor.
+
+Sayfayı yenilediğinizde yapılan her request in console.log ile yazdırıldığını göreceksiniz. (Eğer konsolda bir şey göremiyorsanız, bu bir önceki içi boş serviceworker.js in halen devrede olduğunu gösterir. Bu durumla ilgili "Service Worker Lifecycle - Service Worker Yaşam Döngüsü" ne bakalım.)
+
+#### **Service Worker Lifecycle - Service Worker Yaşam Döngüsü**
+
+Service worker üzerinde değişiklik yaptığınızda yaptığınız değişikliklerin tarayıcıyı yenilediğinizde hemen yayına girmediğini farketmişsinizdir. Bunun sebebi önceki service worker ın halen aktif olmasıdır. Yeni service worker "waiting" durumunda devreye girmek için beklemektedir. Eskisi kontrolü bıraktığında service worker'ın yeni versiyonu devreye girecektir.
+
+Bu durum bir zorluk olarak görülebilir, aslında service worker çalışmasının güçlü özelliklerinden biridir. Bu özelliğe 4. Bölümde değineceğiz.
+
+Şimdilik kolay geliştirebilmek ve oluşturduğumuz service worker yeni versiyonlarını hemen görebilmek için, Chrome Developer Tools'da Application sekmesinde Service Worker kısmında "Update on reload" ı işaretleyebiliriz. Böylece yeni versiyon geldiğinde sayfa yenilenir yenilenmez devreye girer.
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  if (event.request.url.includes("bootstrap.min.css")) {
+    event.respondWith(
+      new Response(
+        ".hotel-slogan {background: green!important;} nav {display:none}",
+        { headers: { "Content-Type": "text/css" }}
+      )
+    );
+  }
+});
+```
+
+Buradaki kod, gelen bir requestin içinde geçen bir ifadeye göre o dosyayı getirmek yerine, bizim o anda javascript ile oluşturduğumuz bir css yanıtı gönderiyor.
+
+#### Progressive Enhancement
+
+Bu kısımda detaylı anlatmış, burayı atlıyorum. Progressive Enhancement kısaca bir özellik için kod yazmadan önce o özelliğin varlığını denetleyip, desteklemeyen cihazlarda herhangi bir şey yapmamak diyebiliriz. Geolocation (Coğrafi konum öğrenme), SpeechRecognition (Ses tanıma), Web kamerasına erişme gibi kodlar hep progressive enhancement olarak yazılmalı. Kullanıcı bu özelliğe sahip olmayabilir veya bize bunu kullanmak için izin vermeyebilir. Bu durumda da kodumuz çalışmalı, ek özellikler üzerine eklene eklene gitmeli.
+
+#### HTTPS gerekliliği
+
+Bir Service Worker sunucu ile kullanıcı arasındaki ağ trafiğini izleyebilir ve değiştirebilir. Bu yüzden kullanımına HTTPS kullanım şartı getirilmiştir. Geliştirme sırasında "localhost" üzerinden https olmadan service worker testlerinizi yapabilirsiniz. (Https kullanmanın başka avantajlarını da sayıyor. Google indekslerinde öncelik, ses tanıma ve konum apilerinin sadece https ile çalışması gibi)
+
+#### Bir içeriği webden çekmek (fetch)
+
+Bir önceki örnekte, belli bir içerik yerine sıfırdan bir Response oluşturup gönderdik. İstersek belli bir dosya yerine başka bir dosyanın gelmesini sağlayabiliriz. Bunun için fetch API kullanmamız gerekir.
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  if (event.request.url.includes("/img/logo.png")) {
+    event.respondWith(
+      fetch("/img/logo-flipped.png")
+    );
+  }
+});
+```
+
+Burada img/logo.png talep edilirken, service worker ağ trafiğinde araya girip o resim yerine başkasını gönderiyor.
+
+`fetch(request[, options]);`
+
+fetch ilk parametresi zorunludur. Girilebilecek değerler: sabit bir url veya `event.request.url` (o anki talebin urlsi) veya `event.request` (o anki talep nesnesinin kendisi)
+Yanıt olarak bir promise döndürür o promise içinde bir Response nesnesi olur.
+
+#### Offline durumları yakalamak ve bir hata mesajı göstermek
+
+Şimdiye kadar öğrendiklerimizi kullanarak kullanıcı offline iken ona özel bir hata mesajı verelim. Önce basitçe aldığı requesti olduğu gibi ileten bir serviceworker.js ile başlayalım.
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  event.respondWith(
+    fetch(event.request)
+  );
+});
+```
+
+Bu kod, aldığı isteği olduğu gibi döndürüyor. Bu anlamsız gelebilir, ancak fetch in bir promise döndürdüğünü hatırlayalım. Bu başarısız olduğunda başarısızlık durumunu `catch` ile yakalayıp o duruma uygun bir yanıt döndürebileceğimiz anlamına geliyor.
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return new Response(
+      "Welcome to the Gotham Imperial Hotel.\n"+
+      "There seems to be a problem with your connection.\n"+
+      "We look forward to telling you about our hotel as soon as you go online."
+      );
+    })
+  );
+});
+```
+
+Burada yanıtı text olarak gönderdik. Eğer yanıtı html olarak göndermek istersek Response nesnesini oluştururken `new Response('içerik', { headers: {"Content-Type": "text/html"} })` şeklinde çağırabiliriz.
+
+#### Service Worker Scope - Service Worker Kapsamı
+
+Service worker varsayılan olarak bulunduğu klasörü ve alt klasörleri kapsar, ancak register işlemi sırasında ikinci parametreyle kapsamını sınırlandırabiliriz.
+
+```javascript
+// These two commands will have the exact same scope:
+navigator.serviceWorker.register("/sw.js");
+navigator.serviceWorker.register("/sw.js", {scope: "/"});
+
+// These two commands will register two service workers
+// each controlling a different directory:
+navigator.serviceWorker.register("/sw-ginnos.js", {scope: "/Ginnos"});
+navigator.serviceWorker.register("/sw-ralphs.js", {scope: "/Ralphs"});
+```
 
 
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
