@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  "TypeScript ve Angular eğitimi 1. Hafta notlarım"
+title:  "TypeScript ve Angular eğitimi notlarım"
 date: 2019-02-03 20:10:00 +0300
 categories: angular typescript
 ---
 
 [Stackblitz örnekleri][Stackblitz]
 
-Şubat ayı boyunca hafta sonları angular ve typescript eğitimi alacağız. Bu eğitimden aldığım notları temize çekiyorum. Bu yazıda ilk hafta notları bulunmaktadır.
+# 1. Hafta
 
 ## TypeScript
 
@@ -147,3 +147,20 @@ Tırnak içinde geçen ifade bir `of` kullanıyor. ES6 ile javascript'e gelen fo
 [Stackblitz]: https://stackblitz.com/@anova
 [ngIf Stackblitz]: https://stackblitz.com/edit/anova-angular-directives-sample?file=src%2Fapp%2Fcomponent%2Fmuhasebe%2Fmuhasebe.component.html
 [ngFor Stackblitz]: https://stackblitz.com/edit/anova-angular-directives-sample?file=src%2Fapp%2Fcomponent%2Fresimler%2Fresimler.component.html
+
+# 2. Hafta
+
+* Direktifler ngFor, ngIf
+* Yeni bir komponent oluşturma
+* Nested component oluşturma ve nested componente parametre olarak model göndermek
+
+# 3. Hafta
+
+* Servise bağlanma ve servisten bir token nasıl alınır?
+* Server-side güvenlik nasıl sağlanmalıdır?
+* Bir projenin klasör yapısı nasıl olmalıdır?
+* Dependency Injection, Observable Pattern
+
+# 4. Hafta
+
+* Component olay sıralaması
