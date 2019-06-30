@@ -7,9 +7,9 @@ categories: angular typescript
 
 [Stackblitz örnekleri][Stackblitz]
 
-# 1. Hafta
+## 1. Hafta
 
-## TypeScript
+### TypeScript
 
 - TypeScript geliştirilmesinde Anders Hejlsberg (Delphi dilini de geliştiren ve C# ekibinde de bulunan bir kişi) rol almıştır.
 - Amaç javascripti daha köşeleri keskin, **strongly typed** bir biçimde yazabilmek. Tip belirtmeden de yazmak mümkün ama kullanım amacına ters, önerilmiyor.
@@ -26,7 +26,7 @@ let a: number = 10;
 
 Sitesine link: [TypeScript][TypeScript]
 
-## Angular
+### Angular
 
 - Angular ikinci versiyonundan bu yana versiyonuyla tanıtım yapmayı bırakmıştır. ( Angular 3, Angular 4, Angular 5 dememektedir.)
 - Angular kurulumu için öncelikle [Angular CLI][Angular CLI] (Command Line Interface) sisteme kurulmalıdır.
@@ -47,7 +47,7 @@ Sitesine link: [TypeScript][TypeScript]
         - css dosyaları stil
         - spec dosyaları da modülün arayüz testini tutar.
 
-### Varsayılan modül
+#### Varsayılan modül
 
 Yeni bir uygulama oluşturduğumuzda, AppModule.ts adlı bir modülü varsayılan modül yapar.
 
@@ -77,51 +77,51 @@ export class AppModule { }
 
 ```
 
-### Model oluşturmak
+#### Model oluşturmak
 
 Veriyi tutması gereken kısım model sınıfıdır. İyi geliştirme pratiği olarak her sınıfın boş da olsa bir modeli olmalı ve veriyi o model tutmalıdır.
 
-### Servis oluşturmak
+#### Servis oluşturmak
 
 Bir işlem yapılacaksa, bunu yapmak servisin işidir. Component veya model işlem veya hesaplama yapmamalıdır. Component işlemi servise yaptırmalıdır. Verileri de modelde tutmalıdır.
 
-### İsimlendirme standartları (Model ve Servisler hangi klasöre gelmeli?)
+#### İsimlendirme standartları (Model ve Servisler hangi klasöre gelmeli?)
 
 Eğer bir servis veya model componente özel ise, componentin bulunduğu klasörde componentin ön eki, model veya service ve ts olacak şekilde isimlendirilmeli. Örneğin app.module.ts için oluşturulan model aynı klasörde app.model.ts, servis ise app.service.ts olmalı.
 
 Uygulamada genel olarak kullanılacak model ve servisleri app/models veya app/services klasörlerinde tutmak daha mantıklıdır.
 
-### Bir component başka bir componenti nasıl çağırır? (Nested components)
+#### Bir component başka bir componenti nasıl çağırır? (Nested components)
 
 `<app-component></app-component>` şeklinde ilgili componentin selectorünü template içinde geçirerek çağırabilir.
 
-### Binding
+#### Binding
 
-#### One way binding
+##### One way binding
 
 `{% raw %}{{ model.Member }}{% endraw %}` şeklinde html template içinde geçtiğinde sadece bir yönlü binding. Güncelleme yapılamaz sadece okunur.
 
 Not: modeldeki veriyi componente bağlamak için örnek bir yazım şekli eklemek lazım.
 
-#### Two way binding
+##### Two way binding
 
 Formlarda binding yapıldığı zaman, formlar bind edilen ifadeyi değiştirebilir.
 
 `<input type="text" [(ngModel)]="model.Member">` gibi bir yazımı var. Formları bağlamak için, `import { FormsModule } from '@angular/forms';` satırını ekleyip
 
-#### event binding
+##### event binding
 
 `<button (click)="btn_Click()">Buton click örnek</button>` böyle bir yazım şekli var. buradaki `btn_Click` ifadesinin component içinde tanımlanması gereklidir.
 
-### Direktifler
+#### Direktifler
 
-#### *ngIf, ng-template
+##### *ngIf, ng-template
 
 *ngIf belirlenen bir şart doğru olduğunda içeriği gösterir. Örneğin:
 
 `<h1 *ngIf="model.IsPersonel">Personel</h1>` buradaki `model.IsPersonel` şartı sağlanıyorsa h1 tagı gösterilir. Eğer şart sağlanmıyorsa, tag yalnızca gizlenmez, aynı zamanda sayfaya render da edilmeyecektir. (Sayfayı veya komponenti öğeyi denetle ile incelediğimizde ilgili tagı yine göremeyiz.) Burada yaptığı iş basitçe gizlemek değil sayfaya render edilip edilmeyeceğine karar vermektir aslında.
 
-#### *ngIf else ile kullanımı (ng-template)
+##### *ngIf else ile kullanımı (ng-template)
 
 ```html
 <h1 *ngIf="model.IsPersonel else not_personel">Personel</h1>
@@ -130,7 +130,7 @@ Formlarda binding yapıldığı zaman, formlar bind edilen ifadeyi değiştirebi
 </ng-template>
 ```
 
-#### *ngFor
+##### *ngFor
 
 *ngFor direktifi bir koleksiyonun içinde döngüye girip, bu döngüde tüm elemanları bastırmak için idealdir. Kendine özgü bir "micro syntax" ı vardır, genellikle şöyle kullanılır:
 
@@ -148,19 +148,27 @@ Tırnak içinde geçen ifade bir `of` kullanıyor. ES6 ile javascript'e gelen fo
 [ngIf Stackblitz]: https://stackblitz.com/edit/anova-angular-directives-sample?file=src%2Fapp%2Fcomponent%2Fmuhasebe%2Fmuhasebe.component.html
 [ngFor Stackblitz]: https://stackblitz.com/edit/anova-angular-directives-sample?file=src%2Fapp%2Fcomponent%2Fresimler%2Fresimler.component.html
 
-# 2. Hafta
+## 2. Hafta
 
-* Direktifler ngFor, ngIf
-* Yeni bir komponent oluşturma
-* Nested component oluşturma ve nested componente parametre olarak model göndermek
+### Yeni bir komponent oluşturma
 
-# 3. Hafta
+Angular CLI ile komut satırında `ng generate component komponent-ismi` şeklinde oluşturabiliyoruz.
+
+### Nested component
+Nested component oluşturma ve nested componente parametre olarak model göndermek
+
+## 3. Hafta
 
 * Servise bağlanma ve servisten bir token nasıl alınır?
 * Server-side güvenlik nasıl sağlanmalıdır?
 * Bir projenin klasör yapısı nasıl olmalıdır?
 * Dependency Injection, Observable Pattern
 
-# 4. Hafta
+## 4. Hafta
 
-* Component olay sıralaması
+* Guard yapısı
+* Event emitter
+* Component lifecycle hooks
+* jQuery pluginleri ile birlikte kullanım
+* Projeye bootstrap ekleme
+* ng build
