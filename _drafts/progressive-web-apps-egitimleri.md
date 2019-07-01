@@ -333,6 +333,130 @@ Burada daha önce görmediğimiz komutlar var. Tek tek açıklayalım.
 
 > Not: Burada dosyanın Content-Type ı cache yazılırken veya okunurken belirtilmiyor çünkü CacheStorage dosyaları (veya kaynakları diyelim) header bilgileriyle birlikte saklar ve getirir.
 
+Yalancı kod (Pseduo code) ile yazacak olursak süreç şöyle işler:
+```
+Yeni bir Service Worker kurulmadan önce
+Bu işlemlerin tamamlandığına emin ol:
+  Başarılı olarak bir cache açmalıyız
+    VE
+    Başarılı olarak bir dosyayı çekmeli
+    VE
+    Cache içine eklemeliyiz
+  Bu adımlardan biri bile başarısız olursa
+  İşlem başarısızdır, Yeni SW yi kurmaktan vazgeç
+```
+
+#### CacheStorage dan öğeleri almak
+
+`install` olayından sonra serviceworker.js dosyasına aşağıdaki kodu ekleyin:
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return caches.match("/index-offline.html");
+    })
+  );
+});
+```
+
+> CacheStorage güvenlik nedeniyle "Same-origin policy" kullanır. Bir dosyayı ancak aynı origin (aynı domain/subdomain) den gelmişse cache den çekebilirsiniz.
+
+#### `match(request [,options])`
+
+`match` metodu parametre olarak bir request alır ve geriye o request için cache den aldığı nesneyi döndürür.
+
+İki şekilde çağrılabilir. Tüm cache ler içinde arama yapabilir veya belirli bir cache ismi içinde request i arayabilir.
+
+```javascript
+// request için tüm cache ler içinde eşleşme arar.
+caches.match("logo.png");
+
+// Belli bir cache içinde request için eşleşme arar.
+caches.open("my-cache").then(function(cache) {
+  return cache.match("logo.png");
+});
+```
+
+match metodunun ilk parametresi istekte bulunulan kaynaktır (request) bunun cache e eklenen ile eşleşmesi gerekir. (cache e hangi isimde koyduysak, o şekilde çağırmalıyız.) İkinci parametre opsiyonel seçeneklerdir.
+
+**match metodunun döndürdüğü promise hiçbir zaman reject edilmez. Dosya bulunamasa bile başarılı bir şekilde boş response döner. Bu yüzden match metodunun döndürdüğü promise içindeki response nesnesi kullanılmadan önce mutlaka kontrol edilmeli ve öyle döndürülmelidir.**
+
+```javascript
+caches.match("/logo.png").then(function (response) {
+  if (response) {
+    return response;
+  }
+});
+```
+
+#### Örnek uygulamamızda cache kullanımı
+
+Bu adımlardan sonra html dosyasını cacheledik. Ancak bu yeterli değil! Bu html ile birlikte gelecek olan stil ve görselleri de CacheStorage içine eklemeliyiz.
+
+(Bunun için önce promise chain ile cache.add leri zincirleme bağlamış, bunu atlıyorum hem efektif olmayan uzun bir metot hem de kaynakları paralel değil seri indiriyor.)
+
+`cache.addAll` metodu örneği
+
+```javascript
+var CACHE_NAME = "gih-cache";
+var CACHED_URLS = [
+  "/index-offline.html",
+  "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
+  "/css/gih-offline.css",
+  "/img/jumbo-background-sm.jpg",
+  "/img/logo-header.png"
+];
+
+self.addEventListener("install", function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(CACHED_URLS);
+    })
+  );
+});
+```
+
+Böylece tüm gerekli dosyalar eklenmiş oldu.
+
+#### Offline durumda her request için doğru dosyayı göndermek
+
+Burada küçük bir kontrol ekleyeceğiz. Eğer yapılan request bir html request ise, index-offline.html dosyasını döndüreceğiz. (Bunu yapmamızın sebebi, index-offline.html dosyasının aynı isimde istenmeyecek olması. Kullanıcı aslında ana sayfayı talep ediyor.) Diğer tüm durumlarda, kullanıcının talep ettiği her dosyaya cache den bakıp varsa göndereceğiz.
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return caches.match(event.request).then(function(response) {
+        if (response) {
+          return response;
+        } else if (event.request.headers.get("accept").includes("text/html")) {
+          return caches.match("/index-offline.html");
+        }
+      });
+    })
+  );
+});
+```
+
+Buradaki fetch metodu online kullanıcılar için aldığı requesti sunucudan alıp doğrudan döndürür. Ama hata durumunda tüm cacheler içinde arama yapar ve dönen yanıtı cache içinde bulursa döndürür.
+
+Bulamadığı durumda, bir kontrol daha yapar, bu istenen request bir html dosyası mıydı? Bu durumda da index-offline.html i döndürür.
+
+#### IGNORESEARCH seçeneği
+
+caches.match gelen kaynak url sine göre hareket ediyor. URL bir sebepten (UTM parametreleri gibi) değişirse bunu dikkate almamak için bir seçenek `{ ignoresearch: true }` seçeneğidir.
+
+Mesela ana sayfaya kişi `/?utm_source=adwords&utm_campaign=kampanya` şeklinde düştüğünde veya başka bir query string ile geldiğinde bunu görmezden gelmesi için şöyle bir seçenek eklemeniz gerekir:
+
+`caches.match(event.request, {ignoreSearch: true})`
+
+#### HTTP Cache ve HTTP üst bilgileri (HTTP Headers)
+
+CacheStorage kullanırken HTTP üst bilgileri ile (max-age) oluşturulan tarayıcı önbelleği yönetilemez.
+
+Eğer network üzerinden çekmek istediğiniz veri tarayıcı cache indeyse oradan gelecektir. Onu ayrıca yönetmeniz gerekir. Bu konuyla ilgili Jake Archibald'ın bir yazısı var: [Caching best practices](https://jakearchibald.com/2016/caching-best-practices/)
+
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
 
 [Progressive Web Apps (PWA) - The Complete Guide](https://learning.oreilly.com/videos/progressive-web-apps/9781789135770)
