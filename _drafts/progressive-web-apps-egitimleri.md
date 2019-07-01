@@ -262,6 +262,76 @@ navigator.serviceWorker.register("/sw-ginnos.js", {scope: "/Ginnos"});
 navigator.serviceWorker.register("/sw-ralphs.js", {scope: "/Ralphs"});
 ```
 
+### Bölüm 3 - CacheStorage API
+
+İkinci bölümde çok güzel bir şey yaptık. Kullanıcının internet bağlantısı kesildiğinde tarayıcının hata mesajı yerine bizim belirlediğimiz bir hata mesajını gördü. Ama bu yeterince tatmin edici değil. Bizim markamıza ait bir imaj, renk ve yazı stili olmadan düz bir html gösterdik. Şimdi amacımız offline olunduğunda gösterilecek olan durumu html, css ve imajlarıyla birlikte göstermektir. Bunun için `index-offline.html` adlı bir dosyayı kullanacağız.
+
+Bunu yapmak için, kullanıcının isteğini alıp, eğer istek başarısız oluyorsa `index-offline.html` adlı dosyayı gösteririz.
+
+```javascript
+self.addEventListener("fetch", function(event) {
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return fetch("/index-offline.html");
+    })
+  );
+});
+```
+
+Buradaki kodda mantık hatası vardır. Zaten offline olan kullanıcı nasıl index-offline.html dosyasını networkden talep edecek? Kullanıcı online iken, index-offline.html dosyası "bir yerlere" kaydedilip, offline iken oradan çekilip gösterilmeli. Neyse ki, service worker ile birlikte CacheStorage API ile offline iken kullanabileceğimiz cache olanağı da tarayıcıda geliyor.
+
+#### CacheStorage nedir, ne değildir?
+
+CacheStorage tamamen sizin kontrolünüzde olan yeni bir cache yapısıdır.
+
+Ne değildir? Tarayıcı önbeleği değildir. Tarayıcı önbeleği CacheStorage dan bağımsız çalışmaya devam eder hatta siz CacheStorage dan değil de ağdan bir kaynağı talep ettiğinizde CacheStorage, öncelikle tarayıcı cache ine bakacaktır.
+
+Tarayıcı cache i, ancak sunucudan gönderilen HTTP üstbilgileri (HTTP Headers) ile yönetilebiliyor.
+
+Ne değildir? Eskimiş bir API olan AppCache ile aynı şey değildir. AppCache, sitedeki hangi dosyaların önbelleğe alınacağını ve offline iken çalışacağını manifest dosyasına bakarak anlayan eski bir yöntemdir. Web standartlarından kaldırılmıştır. (Genel olarak sevilmeyen, hatalı bir yapıdır. [Application Cache is a douchebag - Jake Archibald](https://alistapart.com/article/application-cache-is-a-douchebag/) )
+
+CacheStorage ile şunları yapabiliriz:
+
+1. Öğelerin ne zaman cache'e ekleneceğini seçebiliriz.
+2. Öğelerin ne zaman cache'den silineceğini seçebiliriz.
+3. Hangi öğelerin cache'den hangi öğelerin ağdan çekileceğini belirleyebiliriz.
+
+#### Öğeleri ne zaman cache'e eklemeliyiz?
+
+Bir service worker'ın üç aşaması vardır. Önce kurulumu, sonra aktif edilme aşaması geçilir ve en sonunda aktif hale gelir. Basitçe gösterirsek:
+
+```
++------------+        +------------+        +-----------+
+| Installing | -----> | Activating | -----> | Activated |
++------------+        +------------+        +-----------+
+```
+
+Şimdiye kadar Service Worker içinde sadece fetch olayını kullandık. Bu aktif bir service worker gerektiriyor.
+
+Service Worker yaşam döngüsü içinde daha erken gerçekleşen başka bir olayda cache işlemini yapmalıyız. Bu iş için `install` olayını kullanabiliriz. Hatta burada hata olursa bu olayın içinde yeni Service Worker versiyonunun kurulumunu iptal de edebiliriz. Önbelleğe alınacak dosyaları service worker'ın bir bağımlılığı (dependency) olarak yazarsak, yeni service worker ımız aktif olduğunda gönül rahatlığıyla cache e atılan dosyaları önbellekten çağırabiliriz. (Çünkü bu dosyaların önbelleğe yazılmasını service worker ın kurulumu için ön şart yaptık)
+
+#### Öğeleri CacheStorage'a eklemek
+
+`serviceworker.js` dosyasını temizleyelim ve içine şunları yazalım:
+
+```javascript
+self.addEventListener("install", function(event) {
+  event.waitUntil(
+    caches.open("gih-cache").then(function(cache) {
+      return cache.add("/index-offline.html");
+    })
+  );
+});
+```
+
+Burada daha önce görmediğimiz komutlar var. Tek tek açıklayalım.
+
+1. `install` olayı. Bu olay yeni bir Service Worker kayıt edildiği zaman kurulum aşamasında tetiklenir. (Not: serviceworker.js üzerinde değişiklik algılanırsa otomatik olarak yeni versiyonun geldiğini tarayıcı algılıyor, ve kayıt ediyor.)
+2. `event.waitUntil` install olayı içinde gerçekleşmesini istediğimiz işlemleri buraya yazıyoruz. "Bu işlemler gerçekleşmeden devam etme" şeklinde ifade edebiliriz.
+3. `caches.open` metodu eğer parametre olarak aldığı isimde bir cache varsa, onu açar. Eğer yoksa o isimde bir cache oluşturur ve bir promise ile sarmalayıp döndürür.
+4. `cache.add` parametre olarak aldığı dosya yolunu cache e ekler. Eklerken "key" olarak da parametreyi kullanır.
+
+> Not: Burada dosyanın Content-Type ı cache yazılırken veya okunurken belirtilmiyor çünkü CacheStorage dosyaları (veya kaynakları diyelim) header bilgileriyle birlikte saklar ve getirir.
 
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
 
