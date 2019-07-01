@@ -230,6 +230,23 @@ self.addEventListener("fetch", function(event) {
 
 Burada yanıtı text olarak gönderdik. Eğer yanıtı html olarak göndermek istersek Response nesnesini oluştururken `new Response('içerik', { headers: {"Content-Type": "text/html"} })` şeklinde çağırabiliriz.
 
+**EKLEME**
+Kitaptaki örneği Türkçe karakterlerle denerken Content-Type yanına `charset=utf-8` ekledik.
+
+```javascript
+self.addEventListener('fetch', function(event){
+    event.respondWith(
+        fetch(event.request.url).catch(function(){
+            return new Response('İnternet bağlantınız kesilmiş. Lütfen internete bağlantıktan sonra tekrar deneyiniz.', {
+                headers: {
+                    "Content-Type": "text/html; charset=utf-8"
+                }
+            });
+        })
+    );
+});
+```
+
 #### Service Worker Scope - Service Worker Kapsamı
 
 Service worker varsayılan olarak bulunduğu klasörü ve alt klasörleri kapsar, ancak register işlemi sırasında ikinci parametreyle kapsamını sınırlandırabiliriz.
