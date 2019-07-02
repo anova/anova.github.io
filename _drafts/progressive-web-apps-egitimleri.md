@@ -526,6 +526,44 @@ Bir sayfa için Service Worker kayıt ettiğimizde o Service Worker çeşitli a�
       \---------------------------------------------------------------------------/
 ```
 
+##### **1. Aşama: Installing (Kuruluyor)**
+
+Yeni bir Service Worker `navigator.serviceWorker.register` metoduyla kayıt edilmeye başlandığında, ilgili serviceworker scripti indirilir, yorumlanır ve "kuruluyor" (installing) aşamasına geçer. Eğer kurulum başarılı olursa Service Worker "kuruldu/bekliyor" aşamasına atlar. (Installed/Waiting)
+
+Bir sebepten installing aşaması başarısız olursa, Service Worker "lüzumsuz" (redundant) durumuna geçer.
+
+Kuruluyor aşamasında `install` olayında `waitUntil` metoduna promise aktarılarak işlem yapılabilir. Bu aktarılan promise çözümlenene kadar kurulum bitmez. Bir sebepten promise reject edilirse, Service Worker kurulumu başarısız olur ve "lüzumsuz" (redundant) durumuna düşer.
+
+> Not: 3. bölümde Service Worker ın başarılı şekilde kurulabilmesi için bazı kaynakların cachestorage a başarılı şekilde yazılmasını bekletmiştik. `install` olayında `waitUntil` içinde cache komutlarını yazarak herhangi bir kaynağın cache e yazılması başarısız olursa kurulum aşaması başarısız olur ve service worker redundant olarak işaretlenip işleme girmez.
+
+##### **2. Aşama: Installed/Waiting (Kuruldu/Bekliyor)**
+
+Service Worker Installing (Kuruluyor) aşamasını başarıyla bitirdikten sonra, "kuruldu" (installed) durumuna geçer. Eğer o an aktif olan başka bir Service Worker yoksa, hemen "aktifleştiriliyor" (activating) durumuna geçer.
+
+Eğer o an aktif olan bir Service Worker varsa "bekliyor" (waiting) durumunda kalır.
+
+> "Bekliyor" durumunu "Service Worker güncelleme" (Updating a Service Worker) bölümünde tekrar inceleyeceğiz.
+
+##### **3. Aşama: Activating (Aktifleştiriliyor)**
+
+Service Worker aktif olup uygulamanızda kontrolü ele almadan hemen önce, `activate` olayı tetiklenir. Kuruluyor aşamasında olduğu gibi, bu olay da içinde bir `waitUntil` çağrısına promise aktarılarak o promise bitince tamamlanacak şekilde ayarlanabilir.
+
+> "Aktifleştiriliyor" durumunda yapacağımız işleri "Neden Önbelleği Yönetmek Zorundayız" (Why We Need to Manage the Cache) bölümünde detaylı göreceğiz.
+
+##### **4. Aşama: Activated (Aktifleştirildi)**
+
+Service Worker aktif olduktan sonra, sayfanın kontrolünü alır ve olayları dinlemeye başlar.
+
+**Bir service worker ancak sayfa yüklenmeden önce onun kontrolünü alabilir. (Zaten yüklenmiş olan sayfanın kontrolünü alamaz.)** Sayfayı yüklediğinizde activated durumuna gelen service worker ın etkisini ancak bir sonraki ziyaretinizde görebilirsiniz.
+
+##### **5. Aşama: Redundant (Lüzumsuz)**
+
+Kayıt edilme (registration) veya yüklenme (install) aşamasında başarısızlığa uğrayan Service Worker'lar doğrudan bu duruma düşer.
+
+Veya yerine yenisi gelmiş "Activated" durumundaki Service Worker'lar bu duruma düşüp "emekli olurlar":)
+
+
+
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
 
 [Progressive Web Apps (PWA) - The Complete Guide](https://learning.oreilly.com/videos/progressive-web-apps/9781789135770)
