@@ -562,6 +562,8 @@ Kayıt edilme (registration) veya yüklenme (install) aşamasında başarısızl
 
 Veya yerine yenisi gelmiş "Activated" durumundaki Service Worker'lar bu duruma düşüp "emekli olurlar":)
 
+> Not: Service Worker durumu tarayıcı penceresi veya sekmesinden bağımsız işlemektedir. Eğer bir kullanıcı bir siteye girip Service Worker'ı "activated" durumuna getirmişse, aynı siteye ait ikinci sekme açıldığında aynı service worker tekrar kurulmaz.
+> Bu bilgiye dayalı olarak, Service Worker kayıt esnasında bir kez gerçekleşmesi gerekli işleri (cache yönetimi gibi) `install` ve `activate` olaylarının sadece bir kez gerçekleşeceği bilgisiyle yapabiliriz.
 
 
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
