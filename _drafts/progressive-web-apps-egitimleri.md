@@ -457,6 +457,75 @@ CacheStorage kullanırken HTTP üst bilgileri ile (max-age) oluşturulan tarayı
 
 Eğer network üzerinden çekmek istediğiniz veri tarayıcı cache indeyse oradan gelecektir. Onu ayrıca yönetmeniz gerekir. Bu konuyla ilgili Jake Archibald'ın bir yazısı var: [Caching best practices](https://jakearchibald.com/2016/caching-best-practices/)
 
+### Bölüm 4 - Service Worker Yaşam Döngüsü ve Önbellek Yönetimi
+
+Service Worker'lar ile çalışmaya başladığınızda, çalışmalarında bir gariplik sezeceksiniz.
+
+Bazen sayfayı yükler yüklemez Service Worker kontrolü ele almış olacak, bazen ise Service Worker aktif iken kontrolü ele alması için bir kez sayfayı yeniden yüklemeniz gerekecek. Öyle durumlar olacak ki, sayfayı ne kadar yenilerseniz yenileyin Service Worker yeni versiyonu bir türlü yayına girmeyecek.
+
+Bölüm 2'de Developer Tools'tan "Update on reload" ayarını açarak sayfa yenilenir yenilenmez Service Worker'ın devreye girmesini sağlamıştık. Ancak gerçek hayatta işler böyle yürümez :)
+
+Service Worker'ların bu şekilde güncellenmesi başlangıçta garip gelebilir, ancak onların basit kurulum aşamalarını öğrendikten sonra bu davranışların (sayfa yüklendiği halde aktif olmaması veya hemen devreye girmemesi gibi davranışlar) tümü anlam kazanmaya başlayacak.
+
+> Not: Bu bölümde, tarayıcı geliştirici araçlarına (Developer tools) atıfta bulunulacak. Her tarayıcının Service Worker için araçları var, bölümün basit / kısa olması için, (her araçtan tek tek bahsetmemek için) sizin Chrome kullandığınız varsayılmıştır.
+
+Bir kullanıcının uygulamamızı nasıl kullandığını görelim. Bunun için kitapla birlikte gelen uygulama kodunu bölüm 4 başlangıcı için ayarlayalım.
+
+```
+git reset --hard
+git checkout ch04-start
+```
+
+Eğer kitap örnek kodunda yerel sunucu çalışır durumda değilse `npm start` ile çalışır hale getirin.
+
+`serviceworker.js` dosyasındaki kodları silin ve şu kodları ekleyin:
+
+```javascript
+self.addEventListener("install", function() {
+  console.log("install");
+});
+
+self.addEventListener("activate", function() {
+  console.log("activate");
+});
+
+self.addEventListener("fetch", function(event) {
+  if (event.request.url.includes("bootstrap.min.css")) {
+    console.log("Fetch request for:", event.request.url);
+    event.respondWith(
+      new Response(
+        ".hotel-slogan {background: green!important;} nav {display:none}",
+        { headers: { "Content-Type": "text/css" }}
+      )
+    );
+  }
+});
+```
+
+Bu kodda `install` ve `activate` olayları dinlenip `console.log` ile developer console a yazdırılmaktadır. Ayrıca `bootstrap.min.css` için oluşan `fetch` istekleri yerine arka planı yeşil yapan ve navigasyonu gizleyen bir css response sıfırdan oluşturulup gönderiliyor.
+
+1. Uygulamayı tarayıcınızda açın. `http://localhost:8443`
+2. "Update on reload" ayarını kapatın. (Çünkü bu bölümde Service Worker yaşam döngüsünü göreceğiz)
+3. Bu sayfa için kayıt edilmiş tüm Service Worker kayıtlarını silin. (Chrome da geliştirici araçlarında - devtools - bunu "Clear Storage" ile yapabiliyoruz.)
+
+Service Worker'ı sildiğiniz için bir sonraki ziyaretinizde henüz Service Worker'ı kurmamış olan ziyaretçi uygulamanızı nasıl görecekse o şekilde göreceğinizden emin oluyorsunuz.
+
+Sayfayı yenilediğinizde sayfanın normal bir şekilde geldiğini göreceksiniz. Konsolda Service worker olaylarıyla ilgili mesajlar görünecek ama sayfaya etki etmeyecek.
+
+Tekrar sayfayı yenilediğinizde bu sefer etki ettiğini (bootstrap.min.css yerine yeşil renk veren response un geldiğini) göreceksiniz. Bu neden böyle oldu? Çünkü ilk yüklenmede Service Worker kuruldu ve aktif edildi ancak hiçbir fetch event Service Worker tarafından işlenmedi. İkinci sayfa yenilemede ise Service Worker önceki ziyarette kurulmuş oluyor ve fetch olaylarını işlemeye başlıyor. Neden değişikliği görmek için iki kez sayfayı yenilemek zorunda kaldık? Bunu anlamak için Service Worker Yaşam Döngüsüne göz atmamız gerekir.
+
+#### Service Worker Yaşam Döngüsü
+
+Bir sayfa için Service Worker kayıt ettiğimizde o Service Worker çeşitli aşamalardan / durumlardan geçmektedir.
+
+```
++------------+     +------------+      +------------+     +-----------+     +-----------+
+| Installing |  -> | Installed/ |  ->  | Activating | ->  | Activated |  -> | Redundant |
++------------+     | Waiting    |      +------------+     +-----------+     +-----------+
+      |            +------------+                                                 ^
+      \---------------------------------------------------------------------------/
+```
+
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
 
 [Progressive Web Apps (PWA) - The Complete Guide](https://learning.oreilly.com/videos/progressive-web-apps/9781789135770)
