@@ -565,6 +565,59 @@ Veya yerine yenisi gelmiş "Activated" durumundaki Service Worker'lar bu duruma 
 > Not: Service Worker durumu tarayıcı penceresi veya sekmesinden bağımsız işlemektedir. Eğer bir kullanıcı bir siteye girip Service Worker'ı "activated" durumuna getirmişse, aynı siteye ait ikinci sekme açıldığında aynı service worker tekrar kurulmaz.
 > Bu bilgiye dayalı olarak, Service Worker kayıt esnasında bir kez gerçekleşmesi gerekli işleri (cache yönetimi gibi) `install` ve `activate` olaylarının sadece bir kez gerçekleşeceği bilgisiyle yapabiliriz.
 
+Şimdi, bir Service Worker'ın çeşitli durumları hakkında bilgi sahibiyiz. Neden service worker kayıtlı olmayan bir sayfada onun etkisini görebilmek için iki kez sayfayı yenilememiz gerekiyor bunu inceleyelim.
+
+Kullanıcı sayfamızı ilk defa ziyaret ettiğinde (Service worker ı silip sayfayı yenileyerek simüle ettiğimiz durum) uygulama service worker ı kayıt etmeye başlar. Service worker scripti indirilir ve kurulum başlar. `install` olayı tetiklenir. Sonra `installed` ve hemen arkasından `activating` durumlarına ilerler. Burada da `activate` olayı tetiklenir. En sonunda Service Worker `activated` durumuna gelir. Artık aktif durumdadır kendi kapsamı içinde yüklenen sayfaları veya oluşan diğer network requestlerini yönetebilir.
+
+Ancak maalesef, bu işlemler olurken bir taraftan sayfamız çoktan yüklenmeye ve tarayıcı tarafından yorumlanmaya başlamıştır. Bir service worker aktif olduktan sonra yüklenen sayfaların fetch olaylarına müdahale edebilir.
+
+##### NEDEN BİR SERVICE WORKER YÜKLENMEYE BAŞLADIKTAN SONRA, ZATEN YÜKLENMİŞ SAYFANIN KONTROLÜNÜ ALAMAZ?
+
+Service Worker, bir sayfanın offline durumunu ve tüm network requestleri yönettiği için sayfa yüklendikten sonra kontrolü alması ve service worker'ı register eden script dosyasına gidecek olan istekleri de yönetmesi sebebiyle sayfa yüklendikten sonra yeni service worker'ı hemen devreye almak sayfanın işleyişini bozabileceği için yapılmaz. (O şekilde çalışmamaktadır.)
+
+#### Service Worker ömrü ve `waitUntil` metodunun önemi
+
+Bir Service Worker kurulup, aktif olduğunda sürekli çalışır mı? Service Worker ların belirli bir tab veya pencereye bağımlı olmadığını öğrenmiştik.
+
+Cevap: Hayır. Tarayıcı o an kayıtlı olan tüm Service Worker ları çalışır halde tutmaz. Bu şekilde tarayıcıların performansı çok olumsuz etkilenirdi.
+
+Bir service worker'ın ömrü, içindeki olaylara bağlıdır. Service Worker'ı ilgilendiren bir olay meydana geldiği sırada Service Worker faaliyete geçer, olayı işler ve olayı işledikten sonra çalışması sonlandırılır.
+
+Kullanıcı sitenizi ziyaret ettiğinde tarayıcı Service Worker'ı kontrol eder, olaylar işlenir ve mümkün olan en kısa sürede işini bitirip sonlandırır. Daha sonra başka bir olay meydana geldiğinde service worker tekrar başlatılır.
+
+Peki Service Worker arka plandan asenkron bir işle çağırınca ne olur? Örneğin aşağıdaki `push` olayına bir bakın. (Push olaylarını 10. Bölümde detaylı göreceğiz.)
+
+```javascript
+self.addEventListener("push", function() {
+  fetch("/updates")
+  .then(function(response) {
+    return self.registration.showNotification(response.text());
+  });
+});
+```
+
+Bu kod `push` olayı tetiklendiğinde, `fetch` çağrılır ve çağrıldıktan sonra `/updates` adresinden aldığı güncellemelerle kullanıcıya bildirim gönderir.
+
+Bu kodda bir problem vardır. fetch asenkron olarak güncellemelere bakmaya başladığında bu olay çoktan bitmiş oluyor. fetch bittiğinde güncellemeleri gösterecek kimse yok.
+
+Service worker olaylarına nasıl bir şey "bitinceye kadar bekle" diyebiliriz. (İngilizcesi wait until) Cevap aslında sorunun içinde, `event.waitUntil` kullanarak bir service worker olayının `waitUntil` in parametre aldığı promise lar kadar beklemesini sağlayabiliriz.
+
+```javascript
+self.addEventListener("push", function() {
+  event.waitUntil(
+    fetch("/updates")
+    .then(function() {
+      return self.registration.showNotification("New updates");
+    })
+  );
+});
+```
+
+Bu örnekte gördüğümüz `push` olayı `event.waitUntil` ile içindeki `fetch` ve `showNotification` bitinceye kadar bekletilir.
+
+#### Service Worker Güncellemek
+
+Şimdi kayıtlı Service Worker yerine yenisini getirmeye çalıştığımızda neler olacağını inceleyelim.
 
 ## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
 
