@@ -619,6 +619,250 @@ Bu örnekte gördüğümüz `push` olayı `event.waitUntil` ile içindeki `fetch
 
 Şimdi kayıtlı Service Worker yerine yenisini getirmeye çalıştığımızda neler olacağını inceleyelim.
 
-## Progressive Web Apps (PWA) - The Complete Guide (Video eğitimi)
+Son örneğimizde Service Worker ile arka planı yeşil yapmıştık. Şimdi onu kırmızı ile değiştirelim.
 
-[Progressive Web Apps (PWA) - The Complete Guide](https://learning.oreilly.com/videos/progressive-web-apps/9781789135770)
+```javascript
+self.addEventListener("fetch", function(event) {
+  if (event.request.url.includes("bootstrap.min.css")) {
+    console.log("Fetch request for:", event.request.url);
+    event.respondWith(
+      new Response(
+        ".hotel-slogan {background: red!important;} nav {display:none}",
+        { headers: { "Content-Type": "text/css" }}
+      )
+    );
+  }
+});
+```
+
+Sayfayı iki veya üç kez yenileyin. Yeni `serviceworker.js` in devreye girmediğini, arka planın yeşil olarak kaldığını göreceksiniz.
+
+Neden böyle oldu? Durumu Chrome Developer Tools altındaki Application -> Service Worker bölümüne bakarsak daha iyi anlarız. Buraya baktığımızda iki service worker'ın sayfa için kayıt edildiğini birinin aktif olduğunu diğerinin de aktif olmak için sıra beklediğini "waiting" görürüz.
+
+Service Worker aktif olan her sayfa yüklenişinde, tarayıcı service worker da değişim olup olmadığını kontrol eder. Eğer son kayıt edildiğinden bu yana script dosyası değişmişse, yeni dosya kayıt edilir ve kurulur. Kurulum tamamlandığında, mevcut service worker ı hemen değiştirmez ve bekleme durumunda kalır. (waiting) Bu durum tarayıcıda o service worker kapsamında olan tüm tablar ve pencereler kapanıncaya veya o service worker kapsamı dışındaki bir sayfayı ziyaret edinceye kadar (service worker kapsamı içinde olan hiçbir pencere ve tab kalmayıncaya kadar) sürer. Mevcut service worker kapsamındaki tüm sayfalar kapandığında aktif olan service worker "redundant" durumuna düşer ve yeni kaydedilmiş service worker aktif olur ve yüklenecek olan yeni sayfaların kontrolünü alır.
+
+Bu durumda, yeni service worker ın aktif olması için iki şey yapabilirsiniz. Ya açık olan sekmeyi kapatıp tekrar açın veya o sekmede başka bir siteye gidip sonra geri butonuyla adrese geri gidin. Yeni service worker versiyonunun aktif olduğunu ve arka planın kırmızıya döndüğünü göreceksiniz.
+
+##### NOT
+
+Neden kurulan yeni service worker versiyonları kapsamı altındaki tüm sayfaların kapanmasını beklemek zorundadır?
+
+Şöyle düşünelim: Bir sitede geziyoruz, bir sayfayı yeni sekmede açtık ve tam o sırada yeni bir service worker devreye girdi. Eğer öteki sekme açıkken, yeni sekmede gelen ve kurulan yeni service worker hemen aktif olursa açtığımız birinci sekme başlangıçta farklı bir service worker tarafından kontrol edilirken hemen bir başkasının kontrolüne girecek. (service worker tab ve pencereden bağımsız ortak kullanılır) Bu hesaplanamayan problemlere sebep olabilir.
+
+#### Neden Önbelleği Yönetmek Zorundayız?
+
+Service Worker'ın yaşam döngüsünü gördüğümüze göre uygulamamızı güncellememiz gerektiğinde artık neler olacağını biliyoruz.
+
+Offline ana sayfamızın içeriğini değiştirmek istediğimizi varsayalım. Service Worker html dosyasının yeni versiyonunu çekmesi ve CacheStorage a yazması gerektiğini nasıl anlayacak?
+
+`serviceworker.js` dosyamızın içeriği şöyle olsun:
+
+```javascript
+var CACHE_NAME = "gih-cache";
+var CACHED_URLS = [
+  "/index-offline.html",
+  "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css",
+  "/css/gih-offline.css",
+  "/img/jumbo-background-sm.jpg",
+  "/img/logo-header.png"
+];
+
+self.addEventListener("install", function(event) {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(CACHED_URLS);
+    })
+  );
+});
+
+self.addEventListener("fetch", function(event) {
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return caches.match(event.request).then(function(response) {
+        if (response) {
+          return response;
+        } else if (event.request.headers.get("accept").includes("text/html")) {
+          return caches.match("/index-offline.html");
+        }
+      });
+    })
+  );
+});
+```
+
+Bir service worker cache kurulumunu `install` olayı sırasında yapıyordu. Cache üzerinde değişiklik yapmak için yeni bir `install` olayı daha tetiklememiz gerekiyor. Bu da `serviceworker.js` scripti üzerinde değişiklik yapıp yeni bir versiyonunun kurulmasını sağlayarak olabilir. Kullanıcı uygulamamızı kapattıktan sonraki ilk ziyaretinde yeni service worker yeni cache ile birlikte devreye girecektir.
+
+İlk adım olarak tanımladığımız `CACHE_NAME` değişkenini değiştirip `gih-cache-v2` yapalım.
+
+```javascript
+var CACHE_NAME = "gih-cache-v2";
+```
+
+Cache ismine bir versiyon numarası eklemek ve onu her service worker / cache değişiminde arttırmak bize iki avantaj sağlar:
+1. Service worker dosyasındaki her değişiklik, tarayıcıya yeni versiyon bildirimidir. Tarayıcı service worker ın yeni halini kuracaktır. (`install` event tetiklenecektir.)
+2. Bu şekilde her service worker için farklı bir cache imiz olacaktır. Yeni service worker kayıt olduğunda eskisi tüm tablar kapanana kadar aktif olacağından iki farklı service worker ın aynı cache i yönetmesindense yeni versiyonda yeni cache i yönetip, eskisini işi bitince silmek daha basit bir yaklaşımdır.
+
+> Not: Cache için sürekli aynı ismi ve versiyon numaralarını arttırarak vermemiz, geliştiricinin kolay anlaması ve takip edebilmesi içindir. Tarayıcı için cache isimlerinin bir anlamı yoktur. Ne isim versek kabul eder.
+
+#### Önbellek yönetimi ve eskileri silmek
+
+Cache ve Service Worker versiyonlama ile her service worker ın kendine özel cache inin olduğu güçlü bir sistem elde ederiz. Service worker ve cache imizi istediğimiz kadar güncelleyebiliriz ve kullanıcılarımız cache ve service worker kaynaklı sürprizler yaşamazlar. Unutmayın, siz service worker ı 327. versiyona yükseltmişken kullanıcı halen 127. versiyonda olabilir. Cache versiyonlarnın her service worker ile sorunsuz yaşadığına emin olmak çok zordur. Bu yüzden her service worker için farklı cache kullanmak en iyisidir.
+
+Bu durumda tek sorun olarak, her yeni service worker devreye girdiğinde artık gereksiz olan eski cache i silmesi gerekmesi kalıyor. Eğer kullanıcının cache ini eskilerini silmeden kullanır ve sürekli şişirirsek tarayıcı buna bir dur diyecektir. Biz önlemimizi almalıyız.
+
+##### DEPOLAMA LİMİTLERİ
+
+Site başına ayrılan CacheStorage limiti ve eski cachelerin ne zaman silineceği konusunda her tarayıcı farklı davranır. Site başına ayrılan alan, tarayıcı, cihaz ve cihazdaki o andaki boş alana göre farklılık gösterebilir.
+
+Site başına ayrılan limitle beraber tarayıcıların bir de cache için ayırdığı toplam limit vardır. Bu toplam limite ulaşıldığında, tarayıcı üzerinden en uzun zaman geçmiş cache i otomatik olarak silecektir.
+
+Tarayıcı bir cache sileceğinde hiçbir zaman bir kısmını silmez. Sitenin cache i ya tamamen silinir veya hiç dokunulmaz. Böylece siteniz kısmi cache den kaynaklı (bir kaynağın cache de olup birinin olmaması) sürprizler yaşamaz.
+
+Cache silmek için gerekli metotlara bakalım:
+
+`caches.delete(cacheName)`
+
+Bu metot parametre olarak aldığı cache i CacheStorage dan siler.
+
+`caches.keys()`
+
+Sitenizin ulaşabildiği tüm cache isimlerini bir promise ile sarmalayıp döndürür.
+
+Bu iki metodu kullanarak sitemize ait cache leri silebiliriz. Örneğin sitemizin tüm cache lerini silmek istersek şöyle bir kod yazabiliriz:
+
+```javascript
+caches.keys().then(function(cacheNames) {
+  cacheNames.forEach(function(cacheName) {
+    caches.delete(cacheName);
+  });
+});
+```
+
+> Dikkat: Bu kitabın örneğinde kullandığımız her service worker için bir cache yerine siz iki farklı cache oluşturup, bir cache de değişmeyen kaynakları tutabilirsiniz. Bu örnek değişmez bir kanun değildir. Kendinize göre uyarlayın.
+
+Uygulamamız bir anda en fazla iki cache e ihtiyaç duyar: Birisi o anda aktif service worker için, birisi de yeni kayıt edilmiş bekleyen service worker için. Bunların dışında "lüzumsuz" olarak işaretlenmiş bir service worker varsa (adı üstünde) ona ait cache de "lüzumsuz" olur.
+
+1. Her yeni service worker kurulumunda yeni bir cache başlatırız.
+2. Yeni bir service worker aktif olduğunda, eski service worker lar tarafından oluşturulmuş cache leri silmek güvenlidir.
+
+Kodumuz zaten birinci adımı sağlamaktadır. Şimdi temizlik için yeni bir service worker olayına ihtiyacımız var. Bu iş için en uygun olay `activate` olayıdır.
+
+Şimdi `serviceworker.js` dosyasındaki `CACHE_NAME` değişkenini `gih-cache-v4` yapalım ve service worker dosyasının sonuna şu kodu ekleyelim:
+
+```javascript
+self.addEventListener("activate", function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.map(function(cacheName) {
+          if (CACHE_NAME !== cacheName &&  cacheName.startsWith("gih-cache")) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+```
+
+Kod artık bir olayı daha dinliyor: `activate` Bu aşamada zaten `install` olayı bitmiş ve cache e yazılması gereken tüm kaynaklar yazılmış durumdadır. Burada eski cache leri silme işlemini yapacağız.
+
+Bu kodu satır satır inceleyelim.
+
+İlk olarak `event.waitUntil` ile olayın içindeki promise kadar uzamasını sağlıyoruz. Eski cache lerin tümü silinene kadar service worker ın activate olayının bitmesini bekletiyoruz.
+
+Bu metodun parametresi olan promise `caches.keys()` ile ulaşabildiğimiz tüm cache isimleri bir dizi olarak döndüren başka bir promise içine giriyoruz.
+
+Bu promise sonucunda dönen dizi üzerinde her biri üzerinde bir işlem yapıp bu işlemlerin sonuçlanmasını beklemek için ise `Promise.all` metodundan faydalanıyoruz.
+
+> Not: `Promise.all` promise nesnelerinden oluşan bir diziyi (array) alır ve sonucunda dizideki tüm promise ların çözümlendiği tek bir promise haline getirir. Eğer dizi içindeki tüm promise lar çözümlenmişse (resolve) bu oluşan yeni promise da çözümlenmiş olur.(then bloğuna düşer) Eğer biri bile reddedilmişse (reject) bu oluşan yeni promise reddedilmiş olur. (catch bloğuna düşer)
+
+Bu işlemlerin içindeki `if` satırı ile cache isminin "gih-cache" ile başladığını ve o anda aktif olan cache olmadığını kontrol ettikten sonra sileriz.
+
+Bunu şöyle yazabiliriz:
+```
+Service worker activate olduğunda:
+  Şunlar olana kadar bekle:
+    Her bir cache key için şunu kontrol et:
+      Cache ismi "gih-cache" ile başlıyor mu?
+      VE
+      Cache ismi şu an aktif olan cache ismi ile aynı değil mi?
+        Bu durumda cache gereksizdir, onu sil.
+```
+
+#### Önbellekteki kaynakları yeniden kullanmak
+
+Versiyonlanmış cache kullanmak, çok etkili bir yöntemdir. Ancak halen bir eksiğimiz var.
+
+Her yeni cache oluşturduğumuzda, `cache.add()` ve `cache.addAll()` ile uygulamanın gerek duyduğu kaynakları tekrar tekrar cache e ekliyoruz. Peki kullanıcı zaten `cache-v1` e sahipse ve biz `cache-v2` yi oluşturuyorsak, ayrıca oluşturmak istediğimiz cache içinde önceki cache ile aynı kaynaklar varsa ve değişmemiş ise, bu kaynakları tekrar networkden talep etmek ve bant genişliğini harcamak doğru olmaz. Eski cache den alıp, yeni cache e kopyalamamız yeterli olacaktır. Bunu nasıl yaparız?
+
+Birincisi kaynakları sınıflandırmalıyız. Değişmeyen kaynaklar ve değişen kaynaklar şeklinde. Değişen kaynaklar için ise en iyi pratik olarak, kaynak her değiştiğinde ismi de değişmelidir. Böylece tarayıcı önbelleğinden de maksimum şekilde faydalanabiliriz. (max-age header ını yüksek bir değere kurabiliriz.) Bir kod örneği üzerinden bu fikri inceleyelim:
+
+```javascript
+var immutableRequests = [
+  "/fancy_header_background.mp4",
+  "/vendor/bootstrap/3.3.7/bootstrap.min.css",
+  "/css/style-v355.css"
+];
+var mutableRequests = [
+  "app-settings.json",
+  "index.html"
+];
+
+self.addEventListener("install", function(event) {
+  event.waitUntil(
+    caches.open("cache-v2").then(function(cache) {
+      var newImmutableRequests = [];
+      return Promise.all(
+        immutableRequests.map(function(url) {
+          return caches.match(url).then(function(response) {
+            if (response) {
+              return cache.put(url, response);
+            } else {
+              newImmutableRequests.push(url);
+              return Promise.resolve();
+            }
+          });
+        })
+      ).then(function() {
+        return cache.addAll(newImmutableRequests.concat(mutableRequests));
+      });
+    })
+  );
+});
+```
+
+Bu kodda cache içine eklenecek kaynakları iki sınıfa ayırdık. Değişmeyen kaynaklar (immutableRequests) ve değişen kaynaklar (mutableRequests).
+
+Kod immutableRequests elemanlarının her biri için önce cache kontrolü yapıyor. Eğer bu kaynağı cache içinde bulursa `cache.put` ile eski cache den aldığı response u yeni cache e atıyor. Bulamazsa bir diziye ekliyor ve `cache.addAll` tarafından network den talep edilecek requestler arasına katıyor.
+
+#### NOT
+
+Bu teknik için kitabın yazarı hazır bir çözüm geliştirmiş. [cache.adderall](https://www.talater.com/adderall/)
+
+Kullanımı:
+```javascript
+importScripts("cache.adderall.js");
+
+self.addEventListener("install", function(event) {
+  event.waitUntil(
+    caches.open("cache-v2").then(function(cache) {
+      return adderall.addAll(cache, IMMUTABLE_URLS, MUTABLE_URLS)
+    })
+  )
+});
+```
+
+#### Server header larını doğru ayarlamak
+
+`serviceworker.js` dosyanızı yayına atmadan önce onun expiration header larının 1 dakika veya 10 dakika gibi kısa bir süre olduğundan emin olun. Aksi takdirde tarayıcı serviceworker.js in değiştiğini tarayıcı cache inden dolayı anlayamayabilir.
+
+Bir önlem olarak service worker destekleyen tarayıcılar maksimum 24 saat sonra yeni versiyonu kontrol etmek üzere ayarlıdır. Siz daha uzun bir süre verseniz bile 24 saat sonra yeni versiyon kontrol edilir.
+
+#### Tarayıcı araçları ve Konsol
+
+Konsolda service worker a ait bir komut çalıştırmak için konsoldaki bir dropdown ile scope'u değiştirip service worker a getirmeniz gereklidir.
+
+**Lighthouse** (Kitap biraz eski, yeni versiyonlarda lighthouse eklenti değil çünkü.) Sitenizin PWA standartlarını ne kadar sağladığını test edebilirsiniz.
+
+Chrome Developer tools ile o anda hangi service worker'ın aktif olduğunu, cache in hangi versiyonunun aktif olduğunu ve cache içinde neler olduğunu görebilirsiniz.
