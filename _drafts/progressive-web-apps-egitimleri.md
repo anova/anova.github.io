@@ -866,3 +866,26 @@ Konsolda service worker a ait bir komut çalıştırmak için konsoldaki bir dro
 **Lighthouse** (Kitap biraz eski, yeni versiyonlarda lighthouse eklenti değil çünkü.) Sitenizin PWA standartlarını ne kadar sağladığını test edebilirsiniz.
 
 Chrome Developer tools ile o anda hangi service worker'ın aktif olduğunu, cache in hangi versiyonunun aktif olduğunu ve cache içinde neler olduğunu görebilirsiniz.
+
+### Bölüm 5 - Önce Offline
+
+Uygulamalarımızı geliştirirken, kullanıcının yaşayabileceği bağlantı problemlerine göre geliştirme yapmalıyız. Kullanıcı birçok sebepten offline olabilir veya düşük hızlarda bağlantı problemi yaşayabilir. Özellikle mobil cihazlarda (asansör, uçak, tünel vb.) offline veya düşük hızlı bağlantı her zaman olabilecek bir durumdur.
+
+Kullanıcının offline olması veya düşük hızlı bağlantısı bizim uygulamamız için planlamamız gereken bir durumdur. Bu durumda ne yapacağımızı bilmeliyiz.
+
+#### "Önce Offline" ne demek?
+
+Geleneksel internet uygulamaları, kullanıcının daima internete bağlı olduğu varsayımı ile çalışır. Tüm kaynaklar network den talep edilir ve herhangi bir network sorununda basitçe uygulama hata verir ve çalışmaz.
+
+"Önce Offline" yaklaşımı, kullanıcı bağlantı sorunları yaşadığında kullanıcının tüm uygulamayı görememesi yerine görebileceği kadarını görmesi ve standart tarayıcı hata mesajı yerine, uygulama tarafından belirlenmiş "şu anda bu işlemi yapamıyorsunuz, online olunca yapabileceksiniz" tarzı bir uyarıdan ibarettir. Offline durumu uygulama yönetir ve ona uygun bir cevap verir. Daha önceden oluşturduğu cache lenmiş kaynaklarla da kullanıcıya mümkün olduğu kadar kesintisiz bir deneyim yaşatır.
+
+#### Önbellek Çözümleri
+
+##### **Cache - Sadece Cache**
+
+
+##### **Cache, fallback network - Önce cache orada bulamazsa network**
+##### **Network - Sadece network**
+##### **Network, fallback cache - Önce network, orada bulamazsa cache**
+##### **Cache, then network - Cache'den veriyi sun, sonra network den cache i güncelle**
+##### **Generic fallback - Genel hata yakalama durumu**
