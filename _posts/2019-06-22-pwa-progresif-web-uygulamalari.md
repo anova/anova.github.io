@@ -5,6 +5,8 @@ date: 2019-06-22 16:00 +0300
 categories: pwa
 ---
 
+> Bu yazı Awwards'ın sitesindeki PWA e-kitabıyla ilgili notlarımdır.
+
 - [Progressive Web Applications E-Kitap İngilizce][pwa ebook]
 - [Progresif Web Uygulamaları E-Kitap Türkçe][pwa ekitap]
 

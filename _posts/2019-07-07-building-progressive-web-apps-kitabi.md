@@ -1,12 +1,10 @@
 ---
 layout: post
-title: "Progressive Web Applications Eğitimleri"
+title: "Building Progressive Web Apps Kitabı"
 categories: pwa
 ---
 
-## Building Progressive Web Apps Kitabı
-
-[Building Progressive Web Apps](https://learning.oreilly.com/library/view/building-progressive-web/9781491961643/)
+## [Building Progressive Web Apps Kitabı (Tal Ater)](https://learning.oreilly.com/library/view/building-progressive-web/9781491961643/)
 
 ### Önsöz
 

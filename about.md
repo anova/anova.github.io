@@ -12,13 +12,13 @@ Son zamanlarda ağırlıklı olarak wordpress, php üzerine çalışıyorum. Mod
 
 Şu an okuduğum kitaplar:
 
-1. [Professor Frisby's Mostly Adequate Guide to Functional Programming](https://mostly-adequate.gitbooks.io/mostly-adequate-guide/content/)
-2. [Building Progressive Web Apps](https://learning.oreilly.com/library/view/building-progressive-web/9781491961643/) ([Kitap hakkında notlarım -şu an taslak-](https://github.com/anova/anova.github.io/blob/master/_drafts/progressive-web-apps-egitimleri.md#building-progressive-web-apps-kitab%C4%B1))
+1. [Building Progressive Web Apps](https://learning.oreilly.com/library/view/building-progressive-web/9781491961643/) ([Kitap hakkında notlarım]({{ site.baseurl }}{% post_url 2019-07-07-building-progressive-web-apps-kitabi %}))
+2. [Professor Frisby's Mostly Adequate Guide to Functional Programming](https://mostly-adequate.gitbooks.io/mostly-adequate-guide/content/)
 
-Şu sıralar (2019 Haziran) üzerinde yoğunlaştığım / merak ettiğim konular:
-1. Fonksiyonel Javascript
-2. Progressive Web Uygulamaları (PWA)
-3. Angular framework
+Şu sıralar (2019 Temmuz) üzerinde yoğunlaştığım / merak ettiğim konular:
+1. Progressive Web Uygulamaları (PWA)
+2. Angular framework
+3. Fonksiyonel Javascript
 4. CSS Grid
 5. Fonksiyonel CSS
 
