@@ -6,6 +6,7 @@ categories: javascript
 ---
 
 [Promise, async, await - Özgün Bal][Promise Özgün Bal]
+[Js Async Await / Promise][Async await Şahin Zaybak]
 
 Promise, bir işlemin başarılı veya başarısız olarak biteceğini garanti eden bir yapıdır.
 
@@ -108,3 +109,4 @@ Burada iki adet `then` birbirine zincirleme olarak bağlanmış. Buna **promise 
 [MDN Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [jsonplaceholder]: https://jsonplaceholder.typicode.com/
 [Promise Özgün Bal]: https://medium.com/codefiction/javascriptte-promise-kullan%C4%B1m%C4%B1-ccca1123989a
+[Async await Şahin Zaybak]: https://medium.com/@sahinzaybak1/js-async-await-promise-5ab7fe363cd8
