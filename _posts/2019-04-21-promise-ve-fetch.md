@@ -6,7 +6,7 @@ categories: javascript
 ---
 
 [Promise, async, await - Özgün Bal][Promise Özgün Bal]
-[Js Async Await / Promise][Async await Şahin Zaybak]
+[Js Async Await / Promise - Şahin Zaybak][Async await Şahin Zaybak]
 
 Promise, bir işlemin başarılı veya başarısız olarak biteceğini garanti eden bir yapıdır.
 
