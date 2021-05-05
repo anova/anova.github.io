@@ -1,0 +1,8 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viewport Resolution</title>
+<script>
+const MIN_RESOLUTION = 300;
+const MAX_RESOLUTION = 4000;
+document.addEventListener('DOMContentLoaded', showResolution);
+function showResolution(){ var style_, style, div; style_ = ''; for(var i=MIN_RESOLUTION; i<MAX_RESOLUTION; i++){ style_ += '@media (width:' + i + 'px){ #responsive-debugger-width:after{ content:"' + i + '"}}\n'; style_ += '@media (height:' + i + 'px){ #responsive-debugger-height:after{ content:"' + i + '"}}\n'; }  style_ += '#responsive-debugger{ font-family: sans-serif; position: fixed; top:50%; left:50%; transform: translateX(-50%) translateY(-50%); font-size: 30px; }';  style = document.createElement('style'); style.id = 'responsive-debugger-style'; style.innerHTML = style_; document.body.appendChild(style);  div = document.createElement('div'); div.id = 'responsive-debugger'; div.innerHTML = '<span id="responsive-debugger-width"></span>x<span id="responsive-debugger-height"></span>'; document.body.appendChild(div); }
+</script>
