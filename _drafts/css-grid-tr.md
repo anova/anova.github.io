@@ -1,8 +1,32 @@
 ---
 layout: post
-title: "CSS Grid"
+title: "CSS Grid / Türkçe"
 categories: css
 ---
+
+[CSS Grid / English]({% link _drafts/css-grid-en.md %})
+
+> CSS Grid iki boyutlu bir yerleşim sistemidir.
+
+CSS Gridi iki ana başlık altında inceleyebiliriz.
+1. `display: grid` özelliğini verdiğimiz kapsayıcı eleman.
+2. Kapsayıcı elemanın altındaki, grid alanlarını kullanan elemanlar.
+
+## 1. Kapsayıcı Eleman (grid container)
+
+Flexbox'da olduğu gibi, bir elemana display: grid özelliğini verdiğimizde o eleman bir grid kapsayıcısı olur ve bir seviye altındaki tüm öğelerin yerleşimini belirler duruma gelir.
+
+Flexbox'da bu belirleme işlemi tek eksenlidir. Grid de hem yatay hem de dikeydir.
+
+Grid bu işlemi hayali çizgiler (grid lines) üzerinden yapar ve alanlar arasındaki boşluğu da (gap) belirtebilirsiniz. Böylece yerleşim için ekstra divlere gereksinim olmaz. (Not: flexbox'da eksen değiştirmek isterseniz, ekstra bir div açmanız gerekir. ÖRNEK GEREKİYOR)
+
+## 2. Alt elemanlar
+
+Herhangi bir alt eleman, grid layout içinde hücre veya hücreleri kaplar. Bunu belirlemek için çeşitli yollar vardır.
+
+1. Row / Column belirterek
+2. Grid area belirterek
+3. Kendiliğinden (implicit)
 
 # CSS Grid bir yerleşim sistemidir.
 
