@@ -1,0 +1,26 @@
+<script>
+const turkishCharacters = {
+  'Ç': '&#199;', // Capital c-cedilla
+  'ç': '&#231;', // Lowercase c-cedilla
+  'Ğ': '&#286;', // Capital g-breve
+  'ğ': '&#287;', // Lowercase g-breve
+  'İ': '&#304;', // Capital i-dotted
+  'ı': '&#305;', // Lowercase i-dotless
+  'Ö': '&#214;', // Capital o-umlaut
+  'ö': '&#246;', // Lowercase o-umlaut
+  'Ş': '&#350;', // Capital s-cedilla
+  'ş': '&#351;', // Lowercase s-cedilla
+  'Ü': '&#220;', // Capital u-umlaut
+  'ü': '&#252;', // Lowercase u-umlaut
+};
+function convert(input) {
+    let output = input;
+    Object.keys(turkishCharacters).forEach(key => {
+        output = output.replace(new RegExp(key, 'g'), turkishCharacters[key]);
+    });
+    return output;
+}
+</script>
+<textarea id="input" onkeyup="output.innerText = convert(this.value);"></textarea>
+<hr>
+<span id="output"></span>
