@@ -1,0 +1,93 @@
+html {
+    background-color: gray;
+}
+
+body {
+    font-family: system-ui;
+    max-width: 800px;
+    width: 90%;
+    padding: 15px;
+    margin: 15px auto;
+    background-color: #fafafa;
+    font-size: 1.5rem;
+}
+
+h1 {
+    text-align: center;
+    margin: 0.4rem 0;
+    font-size: clamp(25px, 40px, 8vw);
+}
+
+a {
+    color: brown;
+    text-decoration: none;
+}
+
+@media (hover:hover) {
+    a:hover {
+        text-decoration: underline;
+    }
+}
+
+li + li {
+    margin-top: 0.6rem;
+}
+
+p {
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100%;
+    text-align: center;
+    max-width: 500px;
+    margin: auto;
+}
+
+th, td {
+    border-width: 2px;
+    border-style: solid;
+}
+
+th,
+td > a {
+    padding: 5px;
+}
+
+td > a {
+    background-color: lightgrey;
+    display: block;
+}
+
+pre {
+    padding: 10px;
+    overflow: auto;
+}
+
+.dark {
+    background-color: black;
+    color: white;
+}
+
+.breadcrumb {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.breadcrumb li {
+    margin: 0 3px;
+}
+
+.breadcrumb li::after {
+    content: '/';
+    margin-left: 3px;
+}
+.breadcrumb li:last-child::after {
+    display: none;
+}
