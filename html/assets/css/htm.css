@@ -19,7 +19,7 @@ h1 {
 }
 
 a {
-    color: brown;
+    color: tomato;
     text-decoration: none;
 }
 
@@ -90,4 +90,9 @@ pre {
 }
 .breadcrumb li:last-child::after {
     display: none;
+}
+.dark code {
+  background-color: darkslategray;
+  padding: 2px;
+  margin: -2px;
 }

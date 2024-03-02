@@ -1,10 +1,33 @@
 <title>Grunt notlarım</title>
 <link rel="stylesheet" href="../assets/css/htm.css">
 <script src="../assets/js/breadcrumb.js"></script>
+<body class="dark">
 
-<h2>
-Grunt nedir?
-</h2>
-<p>
-Grunt bir javascript görev çalıştırıcısıdır. (Task runner) Grunt ile bir konfigürasyon dosyası yardımıyla, belli görevleri (sass dosyalarını css e çevirme, javascript dosyalarını birleştirme ve küçültme, css dosyalarına ön ek -prefix- ekleme) otomatik olarak yerine getirebilir. Bunun için ilgili grunt pluginlerini kurmanız ve Gruntfile.js adlı konfigürasyon dosyasında ayarlarını yapmanız yeterlidir.
-</p>
+<h2>Grunt Nedir?</h2>
+
+<p>Grunt bir javascript görev çalıştırıcısıdır. (Task runner) Grunt ile bir konfigürasyon dosyası yardımıyla, belli görevleri (sass dosyalarını css e çevirme, javascript dosyalarını birleştirme ve küçültme, css dosyalarına ön ek -prefix- ekleme) otomatik olarak yerine getirebilir. Bunun için ilgili grunt pluginlerini kurmanız ve <code>Gruntfile.js</code> adlı konfigürasyon dosyasında ayarlarını yapmanız yeterlidir.</p>
+
+<h2>Grunt nasıl kurulur?</h2>
+
+<p>Grunt’ı kurabilmek için önce sisteminizde nodejs yüklü olmalı. Nodejs ile gelen npm paket yöneticisi ile grunt’ı kurabilirsiniz.</p>
+
+<p>Grunt’ı sisteminizde <code class="language-plaintext highlighter-rouge">npm install -g grunt-cli</code> komutunu vererek kurabilirsiniz.</p>
+
+<h3>Projede Grunt ayarları nasıl yapılır?</h3>
+
+<p>Grunt sistemde kurulduktan sonra, ayrıca proje klasöründe de kurulmalıdır. Bunun için öncelikle sisteminizi npm modüllerinin kurulabileceği şekle getirmeniz gerekir. Projenizde bir “package.json” dosyası bulunmuyorsa, <code class="language-plaintext highlighter-rouge">npm init -y</code> komutuyla, varsayılan değerlerle bir package.json dosyası oluşmasını sağlayabilirsiniz.</p>
+
+<p>“package.json” dosyası oluştuktan sonra, grunt ve pluginlerini projede kurabilir ve ayarlamalarını Gruntfile.js dosyası içinde yapabilirsiniz. Burada her plugin için ayrı ayarlama gerektiği için, esas öğrenmeniz gereken ilgili plugin konfigürasyonu olacak.</p>
+
+<h2>.gitignore dosyası</h2>
+
+<p>Grunt ve grunt pluginlerini kurduğunuzda, ilgili projenin içindeki <code>node_modules</code> klasöründe yüklü miktarda dosya olacaktır. Bu dosyaları versiyon kontrolüne (git) eklemeniz, git repository boyutunu gereksiz yere şişirecektir. Bu yüzden <code>node_modules</code> klasörü .gitignore dosyasına eklenmeli ve repositorye eklenmemesi sağlanmalıdır. package.json dosyası zaten hangi dosyaların kurulacağı bilgisini tutuyor. Repositoryi alan kişi ayrıca proje klasöründe <code>npm install</code> diyerek npm paketlerini alabilmektedir.</p>
+
+<p>.gitignore dosyasını oluşturmak için <a href="https://gitignore.io">gitignore.io</a> sitesini kullanabilirsiniz.</p>
+
+<p>Örneğin benim genellikle wordpess, sass, postcss ve autoprefixer kullanan bir projede kullandığım gitignore dosyası: <a href="https://www.gitignore.io/api/node,grunt,wordpress">Örnek gitignore dosyası</a></p>
+
+<h2>Wordpress underscores.me (sassify seçeneği ile) için örnek bir Gruntfile.js dosyası</h2>
+<p><a href="https://gist.github.com/anova/524353b7d98972b8256458ba68f0172b">underscores.me ile oluşturulan bir tema için örnek gruntfile dosyası</a></p>
+
+<p>Buradaki örnekte underscores.me içindeki tema adına “example-theme” ismi verildi ve bilgisayarımda “localhost/example-wp” üzerinden çalıştırıldı. (BrowserSync ayarlarındaki <code>proxy: 'localhost/example-wp'</code> buradan geliyor.)</p>

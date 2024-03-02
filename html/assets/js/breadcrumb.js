@@ -17,7 +17,7 @@ for(let i = parts.length - 1; i > 0; i--) {
     }
 }
 
-console.log('breadcrumb_array', breadcrumb_array);
+//console.log('breadcrumb_array', breadcrumb_array);
 
 let breadcrumb_markup = '<ul class="breadcrumb">';
 for(let i = breadcrumb_array.length - 1; i > 0; i--) {
